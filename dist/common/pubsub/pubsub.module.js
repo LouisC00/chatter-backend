@@ -10,6 +10,10 @@ exports.PubSubModule = void 0;
 const common_1 = require("@nestjs/common");
 const injection_tokens_1 = require("../constants/injection-tokens");
 const graphql_subscriptions_1 = require("graphql-subscriptions");
+const config_1 = require("@nestjs/config");
+const graphql_redis_subscriptions_1 = require("graphql-redis-subscriptions");
+const ioredis_1 = require("ioredis");
+const reviver_1 = require("./reviver");
 let PubSubModule = class PubSubModule {
 };
 exports.PubSubModule = PubSubModule;
@@ -19,7 +23,21 @@ exports.PubSubModule = PubSubModule = __decorate([
         providers: [
             {
                 provide: injection_tokens_1.PUB_SUB,
-                useValue: new graphql_subscriptions_1.PubSub(),
+                useFactory: (configService) => {
+                    if (configService.get('NODE_ENV') === 'production') {
+                        const options = {
+                            host: configService.getOrThrow('REDIS_HOST'),
+                            port: configService.getOrThrow('REDIS_PORT')
+                        };
+                        return new graphql_redis_subscriptions_1.RedisPubSub({
+                            publisher: new ioredis_1.default(options),
+                            subscriber: new ioredis_1.default(options),
+                            reviver: reviver_1.reviver
+                        });
+                    }
+                    return new graphql_subscriptions_1.PubSub();
+                },
+                inject: [config_1.ConfigService],
             },
         ],
         exports: [injection_tokens_1.PUB_SUB],
