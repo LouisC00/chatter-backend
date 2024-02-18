@@ -26,13 +26,18 @@ import { AuthService } from './auth/auth.service';
       driver: ApolloDriver,
       useFactory: (authService: AuthService) => ({
         autoSchemaFile: true,
-        cors: true,
+        // cors: true,
+        path: '/api/graphql',
         subscriptions: {
           'graphql-ws': {
+            path: '/api/graphql',
             onConnect: (context: any) => {
               try {
                 const request: Request = context.extra.request;
-                const user = authService.verifyWs(request, context.connectionParams);
+                const user = authService.verifyWs(
+                  request,
+                  context.connectionParams,
+                );
                 context.user = user;
               } catch (err) {
                 new Logger().error(err);
