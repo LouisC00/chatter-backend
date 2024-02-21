@@ -12,6 +12,7 @@ async function bootstrap() {
     app.useLogger(app.get(nestjs_pino_1.Logger));
     app.use(cookieParser());
     app.enableCors();
+    app.setGlobalPrefix('/api');
     const configService = app.get(config_1.ConfigService);
     await app.listen(configService.getOrThrow('PORT'));
 }

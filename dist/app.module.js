@@ -38,8 +38,10 @@ exports.AppModule = AppModule = __decorate([
                 useFactory: (authService) => ({
                     autoSchemaFile: true,
                     cors: true,
+                    path: '/api/graphql',
                     subscriptions: {
                         'graphql-ws': {
+                            path: '/api/graphql',
                             onConnect: (context) => {
                                 try {
                                     const request = context.extra.request;
