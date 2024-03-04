@@ -33,12 +33,6 @@ export class UsersController {
     file: Express.Multer.File,
     @CurrentUser() user: TokenPayload,
   ) {
-    // return this.usersService.uploadImage(file.buffer, user._id);
-
-    // This now returns the URL of the uploaded image
-    const imageUrl = await this.usersService.uploadImage(file.buffer, user._id);
-
-    // Return the image URL to the client for immediate UI update
-    return { imageUrl };
+    return this.usersService.uploadImage(file.buffer, user._id);
   }
 }
