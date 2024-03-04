@@ -14,11 +14,15 @@ export class S3Service {
 
     const clientConfig: S3ClientConfig = {
       region, // Specify the region in the client configuration
-      credentials: {
+    };
+
+    // Use credentials from environment variables only if they are provided
+    if (accessKeyId && secretAccessKey) {
+      clientConfig.credentials = {
         accessKeyId,
         secretAccessKey,
-      },
-    };
+      };
+    }
 
     this.client = new S3Client(clientConfig);
   }
