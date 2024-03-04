@@ -65,10 +65,10 @@ export class UsersService {
   // }
 
   async uploadImage(file: Buffer, userId: string): Promise<string> {
-    console.log('Uploading image for user:', userId);
+    console.error('Uploading image for user:', userId);
 
     const key = this.getUserImage(userId);
-    console.log('Generated S3 key:', key);
+    console.error('Generated S3 key:', key);
 
     try {
       await this.s3Service.upload({
@@ -76,7 +76,7 @@ export class UsersService {
         key: key,
         file,
       });
-      console.log('Image uploaded to S3 successfully');
+      console.error('Image uploaded to S3 successfully');
     } catch (error) {
       console.error('Error uploading image to S3:', error);
       throw error; // Rethrow the error to handle it further up the call stack
@@ -84,7 +84,7 @@ export class UsersService {
 
     // Construct the URL of the uploaded image
     const imageUrl = this.s3Service.getObjectUrl(USERS_BUCKET, key);
-    console.log('Constructed image URL:', imageUrl);
+    console.error('Constructed image URL:', imageUrl);
 
     try {
       // Update the user's document in MongoDB with the new image URL
@@ -92,7 +92,7 @@ export class UsersService {
         { _id: userId },
         { $set: { imageUrl: imageUrl } },
       );
-      console.log('User document updated in MongoDB with image URL');
+      console.error('User document updated in MongoDB with image URL');
     } catch (error) {
       console.error('Error updating user document in MongoDB:', error);
       throw error; // Rethrow the error to handle it further up the call stack
