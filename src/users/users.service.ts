@@ -42,22 +42,61 @@ export class UsersService {
   //     file,
   //   });
   // }
+
+  // async uploadImage(file: Buffer, userId: string): Promise<string> {
+  //   const key = this.getUserImage(userId);
+  //   await this.s3Service.upload({
+  //     bucket: USERS_BUCKET,
+  //     key: key,
+  //     file,
+  //   });
+
+  //   // Construct the URL of the uploaded image
+  //   const imageUrl = this.s3Service.getObjectUrl(USERS_BUCKET, key);
+
+  //   // Update the user's document in MongoDB with the new image URL
+  //   await this.usersRepository.findOneAndUpdate(
+  //     { _id: userId },
+  //     { $set: { imageUrl: imageUrl } },
+  //   );
+
+  //   // Return the new image URL for immediate use (e.g., updating the client-side UI)
+  //   return imageUrl;
+  // }
+
   async uploadImage(file: Buffer, userId: string): Promise<string> {
+    console.log('Uploading image for user:', userId);
+
     const key = this.getUserImage(userId);
-    await this.s3Service.upload({
-      bucket: USERS_BUCKET,
-      key: key,
-      file,
-    });
+    console.log('Generated S3 key:', key);
+
+    try {
+      await this.s3Service.upload({
+        bucket: USERS_BUCKET,
+        key: key,
+        file,
+      });
+      console.log('Image uploaded to S3 successfully');
+    } catch (error) {
+      console.error('Error uploading image to S3:', error);
+      throw error; // Rethrow the error to handle it further up the call stack
+    }
 
     // Construct the URL of the uploaded image
     const imageUrl = this.s3Service.getObjectUrl(USERS_BUCKET, key);
+    console.log('Constructed image URL:', imageUrl);
 
-    // Update the user's document in MongoDB with the new image URL
-    await this.usersRepository.findOneAndUpdate(
-      { _id: userId },
-      { $set: { imageUrl: imageUrl } },
-    );
+    try {
+      // Update the user's document in MongoDB with the new image URL
+      await this.usersRepository.findOneAndUpdate(
+        { _id: userId },
+        { $set: { imageUrl: imageUrl } },
+      );
+      console.log('User document updated in MongoDB with image URL');
+    } catch (error) {
+      console.error('Error updating user document in MongoDB:', error);
+      throw error; // Rethrow the error to handle it further up the call stack
+    }
 
     // Return the new image URL for immediate use (e.g., updating the client-side UI)
     return imageUrl;
