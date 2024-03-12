@@ -23,8 +23,7 @@ let UsersController = class UsersController {
         this.usersService = usersService;
     }
     async uploadProfilePicture(file, user) {
-        const imageUrl = await this.usersService.uploadImage(file.buffer, user._id);
-        return { imageUrl };
+        return this.usersService.uploadImage(file.buffer, user._id);
     }
 };
 exports.UsersController = UsersController;

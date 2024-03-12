@@ -10,22 +10,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.S3Service = void 0;
-const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
 const client_s3_1 = require("@aws-sdk/client-s3");
+const common_1 = require("@nestjs/common");
 let S3Service = class S3Service {
-    constructor(configService) {
-        const accessKeyId = configService.get('AWS_ACCESS_KEY');
-        const secretAccessKey = configService.get('AWS_SECRET_ACCESS_KEY');
-        const region = configService.get('AWS_REGION', 'us-east-1');
-        const clientConfig = {
-            region,
-            credentials: {
-                accessKeyId,
-                secretAccessKey,
-            },
-        };
-        this.client = new client_s3_1.S3Client(clientConfig);
+    constructor() {
+        this.client = new client_s3_1.S3Client({
+            region: 'us-east-2',
+        });
     }
     async upload({ bucket, key, file }) {
         await this.client.send(new client_s3_1.PutObjectCommand({
@@ -41,6 +32,6 @@ let S3Service = class S3Service {
 exports.S3Service = S3Service;
 exports.S3Service = S3Service = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [config_1.ConfigService])
+    __metadata("design:paramtypes", [])
 ], S3Service);
 //# sourceMappingURL=s3.service.js.map

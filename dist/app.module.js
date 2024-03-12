@@ -37,7 +37,6 @@ exports.AppModule = AppModule = __decorate([
                 driver: apollo_1.ApolloDriver,
                 useFactory: (authService) => ({
                     autoSchemaFile: true,
-                    cors: true,
                     path: '/api/graphql',
                     subscriptions: {
                         'graphql-ws': {

@@ -35,14 +35,31 @@ let UsersService = class UsersService {
         }
     }
     async uploadImage(file, userId) {
+        console.error('Uploading image for user:', userId);
         const key = this.getUserImage(userId);
-        await this.s3Service.upload({
-            bucket: users_constants_1.USERS_BUCKET,
-            key: key,
-            file,
-        });
+        console.error('Generated S3 key:', key);
+        try {
+            await this.s3Service.upload({
+                bucket: users_constants_1.USERS_BUCKET,
+                key: key,
+                file,
+            });
+            console.error('Image uploaded to S3 successfully');
+        }
+        catch (error) {
+            console.error('Error uploading image to S3:', error);
+            throw error;
+        }
         const imageUrl = this.s3Service.getObjectUrl(users_constants_1.USERS_BUCKET, key);
-        await this.usersRepository.findOneAndUpdate({ _id: userId }, { $set: { imageUrl: imageUrl } });
+        console.error('Constructed image URL:', imageUrl);
+        try {
+            await this.usersRepository.findOneAndUpdate({ _id: userId }, { $set: { imageUrl: imageUrl } });
+            console.error('User document updated in MongoDB with image URL');
+        }
+        catch (error) {
+            console.error('Error updating user document in MongoDB:', error);
+            throw error;
+        }
         return imageUrl;
     }
     async hashPassword(password) {
