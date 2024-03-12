@@ -35,35 +35,6 @@ export class UsersService {
     }
   }
 
-  // async uploadImage(file: Buffer, userId: string) {
-  //   await this.s3Service.upload({
-  //     bucket: USERS_BUCKET,
-  //     key: this.getUserImage(userId),
-  //     file,
-  //   });
-  // }
-
-  // async uploadImage(file: Buffer, userId: string): Promise<string> {
-  //   const key = this.getUserImage(userId);
-  //   await this.s3Service.upload({
-  //     bucket: USERS_BUCKET,
-  //     key: key,
-  //     file,
-  //   });
-
-  //   // Construct the URL of the uploaded image
-  //   const imageUrl = this.s3Service.getObjectUrl(USERS_BUCKET, key);
-
-  //   // Update the user's document in MongoDB with the new image URL
-  //   await this.usersRepository.findOneAndUpdate(
-  //     { _id: userId },
-  //     { $set: { imageUrl: imageUrl } },
-  //   );
-
-  //   // Return the new image URL for immediate use (e.g., updating the client-side UI)
-  //   return imageUrl;
-  // }
-
   async uploadImage(file: Buffer, userId: string): Promise<string> {
     console.error('Uploading image for user:', userId);
 
