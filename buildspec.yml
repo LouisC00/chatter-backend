@@ -9,9 +9,9 @@ phases:
   pre_build:
     commands:
       - pnpm install
-    build:
-      commands:
-        - pnpm build
+  build:
+    commands:
+      - pnpm build
 
 artifacts:
   files:
