@@ -54,6 +54,7 @@ PORT=5000
 AWS_ACCESS_KEY=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_access_key
 AWS_REGION=us-east-1
+```
 
 ## Contributing
 
@@ -72,4 +73,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 For more details or to discuss potential opportunities, please feel free to reach out.
 
 Thank you for exploring my GraphQL chat application. I'm excited to bring these skills to future projects and continue exploring the possibilities of modern web development.
+
+```
+
 ```
