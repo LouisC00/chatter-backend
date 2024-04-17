@@ -1,4 +1,6 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Subscription, Args, Mutation, Query } from '@nestjs/graphql';
+import { Inject } from '@nestjs/common';
+
 import { ChatsService } from './chats.service';
 import { Chat } from './entities/chat.entity';
 import { CreateChatInput } from './dto/create-chat.input';
@@ -8,10 +10,15 @@ import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { TokenPayload } from '../auth/token-payload.interface';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
+import { PubSub } from 'graphql-subscriptions';
+import { Int } from '@nestjs/graphql';
 
 @Resolver(() => Chat)
 export class ChatsResolver {
-  constructor(private readonly chatsService: ChatsService) {}
+  constructor(
+    private readonly chatsService: ChatsService,
+    @Inject('PUB_SUB') private pubSub: PubSub,
+  ) {}
 
   @UseGuards(GqlAuthGuard)
   @Mutation(() => Chat)
@@ -19,7 +26,9 @@ export class ChatsResolver {
     @Args('createChatInput') createChatInput: CreateChatInput,
     @CurrentUser() user: TokenPayload,
   ): Promise<Chat> {
-    return this.chatsService.create(createChatInput, user._id);
+    const chat = await this.chatsService.create(createChatInput, user._id);
+    this.pubSub.publish('CHAT_CREATED', { chatCreated: chat });
+    return chat;
   }
 
   @UseGuards(GqlAuthGuard)
@@ -41,5 +50,15 @@ export class ChatsResolver {
   @Mutation(() => Chat)
   removeChat(@Args('id', { type: () => Int }) id: number) {
     return this.chatsService.remove(id);
+  }
+
+  @Subscription(() => Chat, {
+    name: 'chatCreated',
+    filter: (payload, variables, context) => {
+      return payload.chatCreated.userId === context.req.user._id;
+    },
+  })
+  chatCreated() {
+    return this.pubSub.asyncIterator('CHAT_CREATED');
   }
 }

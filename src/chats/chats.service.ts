@@ -1,24 +1,35 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChatInput } from './dto/create-chat.input';
 import { UpdateChatInput } from './dto/update-chat.input';
 import { ChatsRepository } from './chats.repository';
 import { PipelineStage, Types } from 'mongoose';
 import { PaginationArgs } from '../common/dto/pagination-args.dto';
 import { UsersService } from '../users/users.service';
+import { PUB_SUB } from '../common/constants/injection-tokens';
+import { PubSub } from 'graphql-subscriptions';
+import { CHAT_CREATED } from './constants/pubsub-triggers';
 
 @Injectable()
 export class ChatsService {
   constructor(
     private readonly chatsRepository: ChatsRepository,
     private readonly usersService: UsersService,
+    @Inject(PUB_SUB) private readonly pubSub: PubSub,
   ) {}
 
   async create(createChatInput: CreateChatInput, userId: string) {
-    return this.chatsRepository.create({
+    const chat = await this.chatsRepository.create({
       ...createChatInput,
       userId,
       messages: [],
     });
+
+    // Publish the new chat event
+    await this.pubSub.publish(CHAT_CREATED, {
+      chatCreated: chat,
+    });
+
+    return chat;
   }
 
   async findMany(
